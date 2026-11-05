@@ -10,6 +10,7 @@ use App\Models\Product\ProductModel;
 use App\Models\Product\WholesalePrice;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
@@ -28,6 +29,11 @@ class ProductService
      */
     public function create(array $productData)
     {
+        return DB::transaction(fn () => $this->createProduct($productData), 3);
+    }
+
+    private function createProduct(array $productData)
+    {
         $product = Product::create([
             'shop_id' => auth()->user()->id,
             'status_id' => $productData['is_published']
@@ -40,12 +46,16 @@ class ProductService
                     'name',
                     'description',
                     'weight',
+                    'cost_price',
+                    'unit',
                     'images',
                     'videos',
                     'variations',
                 ]
             ),
         ]);
+
+        $product->update(['product_code' => sprintf('PRD-%07d', $product->id)]);
 
         $this->syncModels($product, $productData['models'], true);
 
@@ -57,7 +67,7 @@ class ProductService
             }, $productData['wholesale_prices'] ?? []),
         );
 
-        $product->attributes()->attach($productData['attributes'] ?? []);
+        $product->attributes()->attach(collect($productData['attributes'] ?? [])->keyBy('attribute_id')->all());
         $product->categories()->attach($productData['category_path']);
 
         return $product->id;
@@ -134,6 +144,11 @@ class ProductService
      */
     public function update(int $id, array $productData)
     {
+        DB::transaction(fn () => $this->updateProduct($id, $productData), 3);
+    }
+
+    private function updateProduct(int $id, array $productData)
+    {
         $product = Product::findOrFail($id);
 
         $product->update([
@@ -147,6 +162,8 @@ class ProductService
                     'name',
                     'description',
                     'weight',
+                    'cost_price',
+                    'unit',
                     'images',
                     'videos',
                     'variations',
@@ -191,8 +208,10 @@ class ProductService
             return [];
         }
 
+        $modelIds = array_map('intval', $modelIds);
+
         $models = ProductModel::whereIn('id', $modelIds)
-            ->orderByRaw('ARRAY_POSITION(ARRAY[' . join(',', $modelIds) . '], id)')
+            ->orderByRaw('FIELD(id, ' . join(',', $modelIds) . ')')
             ->with('wholesalePirces')
             ->get();
 
@@ -241,9 +260,11 @@ class ProductService
             $productQuery['filter'] ?? [],
         );
 
-        $products = $this->orderBy($products, $productQuery['order_by'])
+        $products->where('status_id', ProductStatus::Published->value);
+        $products = $this->orderBy($products, $productQuery['order_by'] ?? ProductOrder::Newest->value)
+            ->orderByDesc('products.id')
             ->with('models')
-            ->paginate($productQuery['limit'] ?? Pagination::Default);
+            ->paginate($productQuery['limit'] ?? Pagination::Default->value);
 
         return $products;
     }
@@ -266,6 +287,9 @@ class ProductService
 
             case ProductOrder::LowToHigh:
                 return $this->orderByLowToHigh($product);
+
+            case ProductOrder::BestSelling:
+                return $product->orderByDesc('sold');
 
             default:
                 return $product;
@@ -330,13 +354,20 @@ class ProductService
      */
     private function filterByCategories(Builder $product, array $categoryIds)
     {
-        return $product
-            ->join(
-                'product_category_paths',
-                'products.id',
-                '=',
-                'product_category_paths.product_id',
-            )
-            ->whereIn('product_category_paths.category_id', $categoryIds);
+        $children = \App\Models\Product\Category::get(['id', 'parent_id'])->groupBy('parent_id');
+        $selected = [];
+        while ($categoryIds) {
+            $id = (int) array_pop($categoryIds);
+            if (isset($selected[$id])) {
+                continue;
+            }
+            $selected[$id] = true;
+            foreach ($children->get($id, []) as $child) {
+                $categoryIds[] = $child->id;
+            }
+        }
+
+        return $product->whereHas('categories', fn (Builder $categories) =>
+            $categories->whereIn('product_categories.id', array_keys($selected)));
     }
 }

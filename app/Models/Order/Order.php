@@ -13,8 +13,13 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'order_code',
+        'status_id',
+        'recipient_snapshot',
+        'stock_committed_at',
         'user_id',
         'shop_id',
+        'voucher_id',
         'product_id',
         'product_model_id',
         'received_address_id',
@@ -23,11 +28,19 @@ class Order extends Model
         'quantity',
         'total',
         'grand_total',
+        'subtotal',
+        'shipping_fee',
+        'discount_amount',
+        'payment_total',
+        'commission_rate',
+        'commission_amount',
         'variations',
     ];
 
     protected $casts = [
         'variations' => 'array',
+        'recipient_snapshot' => 'array',
+        'stock_committed_at' => 'datetime',
     ];
 
     public $timestamps = false;
@@ -49,7 +62,27 @@ class Order extends Model
 
     public function progresses()
     {
-        return $this->hasMany(Progress::class);
+        return $this->hasMany(Progress::class)->orderBy('created_at')->orderBy('id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
+    }
+
+    public function voucher()
+    {
+        return $this->belongsTo(\App\Models\Promotion\Voucher::class);
     }
 
     public function review()

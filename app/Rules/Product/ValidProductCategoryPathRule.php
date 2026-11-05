@@ -26,8 +26,10 @@ class ValidProductCategoryPathRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $categories = Category::whereIn('id', $value)
-            ->orderByRaw('ARRAY_POSITION(ARRAY[' . join(',', $value) . '], id)')
+        $categoryIds = array_map('intval', $value);
+
+        $categories = Category::whereIn('id', $categoryIds)
+            ->orderByRaw('FIELD(id, ' . join(',', $categoryIds) . ')')
             ->get();
         $count = $categories->count();
 

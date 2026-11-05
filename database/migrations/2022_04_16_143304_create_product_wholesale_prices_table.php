@@ -30,7 +30,7 @@ return new class extends Migration
 
         DB::statement('
             ALTER TABLE product_wholesale_prices
-            ADD CONSTRAINT chk_max CHECK (max > min);
+            ADD CONSTRAINT chk_max CHECK (`max` > `min`);
         ');
     }
 

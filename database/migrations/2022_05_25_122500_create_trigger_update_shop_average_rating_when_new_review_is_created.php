@@ -12,37 +12,72 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::unprepared("
-            CREATE OR REPLACE FUNCTION update_shop_average_rating_when_new_review_is_created()
-            RETURNS TRIGGER AS
-            $$
-            DECLARE
-                calculated_shop_avg_rating float;
-                calculated_product_avg_rating float;
+        DB::unprepared('CREATE TRIGGER update_average_rating_after_insert
+            AFTER INSERT ON product_reviews
+            FOR EACH ROW
             BEGIN
-                IF TG_OP = 'DELETE' OR TG_OP = 'INSERT' OR TG_OP = 'UPDATE' AND NEW.rating <> OLD.rating THEN
-                    SELECT AVG(rating) INTO calculated_shop_avg_rating FROM product_reviews
-                    WHERE shop_id = NEW.shop_id;
-                    SELECT AVG(rating) INTO calculated_product_avg_rating FROM product_reviews
-                    WHERE product_id = NEW.product_id;
+                UPDATE shop_statistics
+                SET avg_rating = COALESCE((
+                    SELECT AVG(rating) FROM product_reviews WHERE shop_id = NEW.shop_id
+                ), 0)
+                WHERE shop_id = NEW.shop_id;
+
+                UPDATE products
+                SET avg_rating = COALESCE((
+                    SELECT AVG(rating) FROM product_reviews WHERE product_id = NEW.product_id
+                ), 0)
+                WHERE id = NEW.product_id;
+            END');
+
+        DB::unprepared('CREATE TRIGGER update_average_rating_after_update
+            AFTER UPDATE ON product_reviews
+            FOR EACH ROW
+            BEGIN
+                IF NOT (OLD.rating <=> NEW.rating)
+                    OR OLD.shop_id <> NEW.shop_id
+                    OR OLD.product_id <> NEW.product_id THEN
+                    UPDATE shop_statistics
+                    SET avg_rating = COALESCE((
+                        SELECT AVG(rating) FROM product_reviews WHERE shop_id = OLD.shop_id
+                    ), 0)
+                    WHERE shop_id = OLD.shop_id;
 
                     UPDATE shop_statistics
-                        SET avg_rating = calculated_shop_avg_rating
+                    SET avg_rating = COALESCE((
+                        SELECT AVG(rating) FROM product_reviews WHERE shop_id = NEW.shop_id
+                    ), 0)
                     WHERE shop_id = NEW.shop_id;
+
                     UPDATE products
-                        SET avg_rating = calculated_product_avg_rating
+                    SET avg_rating = COALESCE((
+                        SELECT AVG(rating) FROM product_reviews WHERE product_id = OLD.product_id
+                    ), 0)
+                    WHERE id = OLD.product_id;
+
+                    UPDATE products
+                    SET avg_rating = COALESCE((
+                        SELECT AVG(rating) FROM product_reviews WHERE product_id = NEW.product_id
+                    ), 0)
                     WHERE id = NEW.product_id;
                 END IF;
+            END');
 
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-
-            CREATE TRIGGER update_shop_average_rating_when_new_review_is_created
-            AFTER INSERT OR UPDATE OR DELETE ON product_reviews
+        DB::unprepared('CREATE TRIGGER update_average_rating_after_delete
+            AFTER DELETE ON product_reviews
             FOR EACH ROW
-            EXECUTE PROCEDURE update_shop_average_rating_when_new_review_is_created();
-        ");
+            BEGIN
+                UPDATE shop_statistics
+                SET avg_rating = COALESCE((
+                    SELECT AVG(rating) FROM product_reviews WHERE shop_id = OLD.shop_id
+                ), 0)
+                WHERE shop_id = OLD.shop_id;
+
+                UPDATE products
+                SET avg_rating = COALESCE((
+                    SELECT AVG(rating) FROM product_reviews WHERE product_id = OLD.product_id
+                ), 0)
+                WHERE id = OLD.product_id;
+            END');
     }
 
     /**
@@ -52,9 +87,8 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('
-            DROP TRIGGER IF EXISTS update_shop_average_rating_when_new_review_is_created ON product_reviews;
-            DROP FUNCTION IF EXISTS update_shop_average_rating_when_new_review_is_created;
-        ');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_average_rating_after_insert');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_average_rating_after_update');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_average_rating_after_delete');
     }
 };

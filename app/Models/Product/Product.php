@@ -11,12 +11,15 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
+        'product_code',
         'shop_id',
         'brand_id',
         'status_id',
         'name',
         'description',
         'weight',
+        'cost_price',
+        'unit',
         'images',
         'videos',
         'variations',
@@ -73,5 +76,15 @@ class Product extends Model
     {
         return $this->belongsTo(Shop::class)
             ->with('statistic');
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

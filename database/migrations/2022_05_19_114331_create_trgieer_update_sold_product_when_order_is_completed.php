@@ -12,24 +12,14 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::unprepared("
-            CREATE OR REPLACE FUNCTION trgieer_update_sold_product_when_order_is_created()
-            RETURNS TRIGGER AS
-            $$
-            BEGIN
-                UPDATE products
-                    SET sold = sold + NEW.quantity
-                WHERE id = NEW.product_id;
-
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-
-            CREATE TRIGGER trgieer_update_sold_product_when_order_is_created
+        DB::unprepared('CREATE TRIGGER trgieer_update_sold_product_when_order_is_created
             AFTER INSERT ON orders
             FOR EACH ROW
-            EXECUTE PROCEDURE trgieer_update_sold_product_when_order_is_created();
-        ");
+            BEGIN
+                UPDATE products
+                SET sold = sold + NEW.quantity
+                WHERE id = NEW.product_id;
+            END');
     }
 
     /**
@@ -39,9 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('
-            DROP TRIGGER IF EXISTS trgieer_update_sold_product_when_order_is_created ON orders;
-            DROP FUNCTION IF EXISTS trgieer_update_sold_product_when_order_is_created;
-        ');
+        DB::unprepared('DROP TRIGGER IF EXISTS trgieer_update_sold_product_when_order_is_created');
     }
 };

@@ -150,10 +150,17 @@ class ResourceService
      */
     public function storeImage($file, $ratioId, $isDemo = false)
     {
-        $imageId = $isDemo
-            ? 'demo-' . md5((string) time())
-            : md5((string) time());
+        $imageId = ($isDemo ? 'demo-' : '') . bin2hex(random_bytes(16));
         $extension = is_string($file) ? 'jpg' : $file->extension();
+        if (!is_string($file) && !extension_loaded('gd') && !extension_loaded('imagick')) {
+            $path = self::$resourcePaths['image'] . $imageId . '.' . $extension;
+            $stored = Storage::putFileAs(dirname($path), $file, basename($path));
+            if (!$stored) {
+                throw new \RuntimeException('Image could not be stored.');
+            }
+
+            return $imageId;
+        }
         $image = $this->processImage(ImageFacade::make($file), $ratioId)->encode($extension);
 
         Storage::put(
@@ -162,7 +169,7 @@ class ResourceService
         );
         Storage::put(
             self::$resourcePaths['image'] . $imageId . '_tn.' . $extension,
-            $image->resize($image->resize(...$this->calculateImageSize('tn', $ratioId)))
+            $image->resize(...$this->calculateImageSize('tn', $ratioId))
                 ->encode($extension)
                 ->__toString(),
         );

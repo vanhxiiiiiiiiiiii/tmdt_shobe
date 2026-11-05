@@ -25,6 +25,7 @@ class GetOrderListRequest extends CustomFormRequest
     {
         return [
             'limit' => 'required|integer|min:1|max:20',
+            'page' => 'sometimes|integer|min:1',
             'status_id' => 'integer|min:1|exists:order_status,id',
         ];
     }

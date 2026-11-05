@@ -15,93 +15,71 @@ return new class extends Migration
     {
         $published = ProductStatus::Published->value;
         $delisted = ProductStatus::Delisted->value;
-        $deleted = ProductStatus::Deleted->value;
 
-        DB::unprepared("
-            CREATE OR REPLACE FUNCTION update_product_count_of_shop_statistic()
-            RETURNS TRIGGER AS
-            $$
+        DB::unprepared("CREATE TRIGGER update_product_count_after_insert
+            AFTER INSERT ON products
+            FOR EACH ROW
             BEGIN
-                IF TG_OP = 'INSERT' THEN
+                IF NEW.status_id = $published THEN
+                    UPDATE shop_statistics
+                    SET
+                        product_count = product_count + 1,
+                        all_product_count = all_product_count + 1
+                    WHERE shop_id = NEW.shop_id;
+                ELSEIF NEW.status_id = $delisted THEN
+                    UPDATE shop_statistics
+                    SET all_product_count = all_product_count + 1
+                    WHERE shop_id = NEW.shop_id;
+                END IF;
+            END");
+
+        DB::unprepared("CREATE TRIGGER update_product_count_after_update
+            AFTER UPDATE ON products
+            FOR EACH ROW
+            BEGIN
+                IF NOT (OLD.status_id <=> NEW.status_id) OR NOT (OLD.shop_id <=> NEW.shop_id) THEN
+                    IF OLD.status_id = $published THEN
+                        UPDATE shop_statistics
+                        SET
+                            product_count = product_count - 1,
+                            all_product_count = all_product_count - 1
+                        WHERE shop_id = OLD.shop_id;
+                    ELSEIF OLD.status_id = $delisted THEN
+                        UPDATE shop_statistics
+                        SET all_product_count = all_product_count - 1
+                        WHERE shop_id = OLD.shop_id;
+                    END IF;
+
                     IF NEW.status_id = $published THEN
                         UPDATE shop_statistics
                         SET
                             product_count = product_count + 1,
                             all_product_count = all_product_count + 1
                         WHERE shop_id = NEW.shop_id;
-
-                    ELSIF NEW.status_id = $delisted THEN
+                    ELSEIF NEW.status_id = $delisted THEN
                         UPDATE shop_statistics
                         SET all_product_count = all_product_count + 1
                         WHERE shop_id = NEW.shop_id;
                     END IF;
-
-                ELSIF TG_OP = 'UPDATE' THEN
-                    IF NEW.status_id = $published THEN
-                        IF OLD.status_id = $delisted THEN
-                            UPDATE shop_statistics
-                            SET product_count = product_count + 1
-                            WHERE shop_id = NEW.shop_id;
-
-                        ELSIF OLD.status_id = $deleted THEN
-                            UPDATE shop_statistics
-                            SET
-                                product_count = product_count + 1,
-                                all_product_count = all_product_count + 1
-                            WHERE shop_id = NEW.shop_id;
-                        END IF;
-
-                    ELSIF NEW.status_id = $delisted THEN
-                        IF OLD.status_id = $published THEN
-                            UPDATE shop_statistics
-                            SET product_count = product_count - 1
-                            WHERE shop_id = NEW.shop_id;
-
-                        ELSIF OLD.status_id = $deleted THEN
-                            UPDATE shop_statistics
-                            SET all_product_count = all_product_count + 1
-                            WHERE shop_id = NEW.shop_id;
-                        END IF;
-
-                    ELSIF NEW.status_id = $deleted THEN
-                        IF OLD.status_id = $published THEN
-                            UPDATE shop_statistics
-                            SET
-                                product_count = product_count - 1,
-                                all_product_count = all_product_count - 1
-                            WHERE shop_id = NEW.shop_id;
-
-                        ELSIF OLD.status_id = $delisted THEN
-                            UPDATE shop_statistics
-                            SET all_product_count = all_product_count - 1
-                            WHERE shop_id = NEW.shop_id;
-                        END IF;
-                    END IF;
-
-                ELSIF TG_OP = 'DELETE' THEN
-                    IF OLD.status_id = $published THEN
-                        UPDATE shop_statistics
-                        SET
-                            product_count = product_count - 1,
-                            all_product_count = all_product_count - 1
-                        WHERE shop_id = NEW.shop_id;
-
-                    ELSIF OLD.status_id = $delisted THEN
-                        UPDATE shop_statistics
-                        SET all_product_count = all_product_count - 1
-                        WHERE shop_id = NEW.shop_id;
-                    END IF;
                 END IF;
+            END");
 
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-
-            CREATE TRIGGER update_product_count_of_shop_statistic
-            AFTER INSERT OR UPDATE OR DELETE ON products
+        DB::unprepared("CREATE TRIGGER update_product_count_after_delete
+            AFTER DELETE ON products
             FOR EACH ROW
-            EXECUTE PROCEDURE update_product_count_of_shop_statistic();
-        ");
+            BEGIN
+                IF OLD.status_id = $published THEN
+                    UPDATE shop_statistics
+                    SET
+                        product_count = product_count - 1,
+                        all_product_count = all_product_count - 1
+                    WHERE shop_id = OLD.shop_id;
+                ELSEIF OLD.status_id = $delisted THEN
+                    UPDATE shop_statistics
+                    SET all_product_count = all_product_count - 1
+                    WHERE shop_id = OLD.shop_id;
+                END IF;
+            END");
     }
 
     /**
@@ -111,9 +89,8 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('
-            DROP TRIGGER IF EXISTS update_product_count_of_shop_statistic ON products;
-            DROP FUNCTION IF EXISTS update_product_count_of_shop_statistic;
-        ');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_product_count_after_insert');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_product_count_after_update');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_product_count_after_delete');
     }
 };

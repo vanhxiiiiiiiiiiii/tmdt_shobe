@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Order;
 
 use App\Http\Requests\CustomFormRequest;
-use App\Rules\Order\ValidProductQuantityRule;
 
 class AddToCartRequest extends CustomFormRequest
 {
@@ -25,13 +24,8 @@ class AddToCartRequest extends CustomFormRequest
     public function rules()
     {
         return [
-            'product_model_id' => 'required|integer|min:1|distinct:strict',
-            'quantity' => [
-                'required',
-                'integer',
-                'min:1',
-                new ValidProductQuantityRule('product_model_id'),
-            ],
+            'product_model_id' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1',
         ];
     }
 }

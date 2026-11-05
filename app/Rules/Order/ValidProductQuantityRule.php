@@ -76,8 +76,10 @@ class ValidProductQuantityRule implements Rule, DataAwareRule
                 return $val[$this->modelKey];
             }, $value);
 
+            $modelIds = array_map('intval', $modelIds);
+
             $models = ProductModel::whereIn('id', $modelIds)
-                ->orderByRaw('ARRAY_POSITION(ARRAY[' . join(',', $modelIds) . '], id)')
+                ->orderByRaw('FIELD(id, ' . join(',', $modelIds) . ')')
                 ->get();
         }
 

@@ -12,7 +12,7 @@ resource "kubernetes_secret" "api_secret" {
   data = {
     APP_KEY = var.app_key
 
-    DB_PASSWORD = var.postgres_password
+    DB_PASSWORD = var.mysql_password
 
     FACEBOOK_CLIENT_ID = var.facebook_client_id
 

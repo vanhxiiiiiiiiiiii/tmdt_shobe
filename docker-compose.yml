@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
     api:
         build:
@@ -13,32 +11,59 @@ services:
             - ./.docker/api/nginx/ssl:/etc/nginx/ssl
             - ./.docker/api/nginx/default.conf:/etc/nginx/conf.d/default.conf
         networks:
-            - postgres-network
+            - mysql-network
         depends_on:
-            - postgres
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         restart: unless-stopped
 
-    postgres:
-        image: postgres:14.1-alpine3.15
+    mysql:
+        image: mysql:8.4
         environment:
-            - POSTGRES_DB=${DB_DATABASE}
-            - POSTGRES_USER=${DB_USERNAME}
-            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
         volumes:
-            - ./.docker/postgres/data:/var/lib/postgresql/data
+            - ./.docker/mysql/data:/var/lib/mysql
         networks:
-            - postgres-network
+            - mysql-network
+        healthcheck:
+            test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$$MYSQL_ROOT_PASSWORD\""]
+            interval: 5s
+            timeout: 5s
+            retries: 20
         restart: unless-stopped
 
     adminer:
-        image: dockette/adminer:pgsql
+        image: adminer:4
         ports:
         - 8081:80
         networks:
-            - postgres-network
+            - mysql-network
         depends_on:
-            - postgres
+            mysql:
+                condition: service_healthy
+        restart: unless-stopped
+
+    redis:
+        image: redis:7-alpine
+        command: redis-server --appendonly yes
+        volumes:
+            - redis-data:/data
+        networks:
+            - mysql-network
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
         restart: unless-stopped
 
 networks:
-    postgres-network:
+    mysql-network:
+
+volumes:
+    redis-data:

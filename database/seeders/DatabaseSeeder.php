@@ -43,6 +43,8 @@ class DatabaseSeeder extends Seeder
             OrderProgressSeeder::class,
 
             ProductReviewSeeder::class,
+
+            ProjectRequirementSeeder::class,
         ]);
     }
 }

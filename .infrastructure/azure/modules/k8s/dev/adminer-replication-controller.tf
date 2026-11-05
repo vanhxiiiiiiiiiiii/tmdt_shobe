@@ -28,7 +28,7 @@ resource "kubernetes_replication_controller" "adminer" {
       spec {
         container {
           name  = "adminer"
-          image = "dockette/adminer:pgsql"
+          image = "adminer:4"
 
           port {
             container_port = 80

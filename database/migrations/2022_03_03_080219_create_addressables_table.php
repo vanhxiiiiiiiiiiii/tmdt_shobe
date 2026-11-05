@@ -31,7 +31,7 @@ return new class extends Migration
                 'addressable_type',
                 'address_id',
                 'type_id',
-            ]);
+            ], 'addressables_owner_address_type_unique');
         });
     }
 

@@ -1,0 +1,25 @@
+{
+    "status": true,
+    "data": {
+        "slug": "shop-de",
+        "name": "Shop odede",
+        "description": "This is a shope of user 01.",
+        "avatar_image": "80acc44fb33c446f51532141f923770f",
+        "cover_image": "80acc44fb33c446f51532141f923770f",
+        "banners": [
+            {
+                "type": "image",
+                "id": "80acc44fb33c446f51532141f923770f",
+                "hyper_link": "https:\/\/www.w3schools.com\/w3css\/img_lights.jpg"
+            }
+        ],
+        "created_at": "2022-05-19T15:07:43.000000Z",
+        "id": 1,
+        "statistic": {
+            "product_count": 100,
+            "all_product_count": 100,
+            "average_raiting": "80",
+            "nonfulfilment_rate": "12"
+        }
+    }
+}

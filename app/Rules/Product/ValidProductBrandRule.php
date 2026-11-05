@@ -53,7 +53,7 @@ class ValidProductBrandRule implements Rule, DataAwareRule
      */
     public function passes($attribute, $value)
     {
-        if (ProductBrand::from($value) === ProductBrand::NoBrand) {
+        if ((int) $value === ProductBrand::NoBrand->value) {
             return true;
         }
 

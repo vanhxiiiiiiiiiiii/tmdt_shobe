@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,9 +17,9 @@ return new class extends Migration
         Schema::create('product_reviews', function (Blueprint $table) {
             $table->id();
             $table->integer('rating', false, true)->default(1);
-            $table->text('comment')->default('');
-            $table->text('reply')->default('');
-            $table->text('variations')->default('[]');
+            $table->text('comment')->default(DB::raw("('')"));
+            $table->text('reply')->default(DB::raw("('')"));
+            $table->text('variations')->default(DB::raw("('[]')"));
 
             $table->foreignId('user_id')
                 ->nullable()

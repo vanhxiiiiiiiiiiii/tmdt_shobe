@@ -24,7 +24,7 @@ return new class extends Migration
                 ->constrained('product_category_attributes')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
-            $table->primary(['category_id', 'attribute_id']);
+            $table->primary(['category_id', 'attribute_id'], 'category_attribute_primary');
         });
     }
 

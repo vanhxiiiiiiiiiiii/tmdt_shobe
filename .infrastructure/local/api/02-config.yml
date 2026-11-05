@@ -13,11 +13,11 @@ data:
 
   FE_URL: "https://e-shopee.vercel.app"
 
-  CORS_ORIGIN: "http://localhost:3333,https://www.shopest.tk,https://e-shopee.vercel.app,https://tp-o.github.io"
+  CORS_ORIGIN: "http://localhost:3333,https://www.shopest.tk,https://e-shopee.vercel.app,https://vanhxiiiiiiiiiiii.github.io"
 
-  DB_CONNECTION: "pgsql"
-  DB_HOST: "postgres"
-  DB_PORT: "5432"
+  DB_CONNECTION: "mysql"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
   DB_DATABASE: "ww_db"
   DB_USERNAME: "ww_username"
 

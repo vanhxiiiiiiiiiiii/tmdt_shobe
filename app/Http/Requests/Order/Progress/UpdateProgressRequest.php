@@ -14,7 +14,11 @@ class UpdateProgressRequest extends CustomFormRequest
      */
     public function authorize()
     {
-        return get_class($this->user()) === AccountType::Admin->value;
+        $isAdmin = get_class($this->user()) === AccountType::Admin->value;
+        $isOwningShop = get_class($this->user()) === AccountType::User->value
+            && $this->user()->id === $this->route('order')->shop_id;
+
+        return $isAdmin || $isOwningShop;
     }
 
     /**
@@ -25,6 +29,7 @@ class UpdateProgressRequest extends CustomFormRequest
     public function rules()
     {
         return [
+            'status_id' => 'required|integer|in:2,3,4,5,6',
             'note' => 'string',
         ];
     }

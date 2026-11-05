@@ -22,11 +22,11 @@ resource "kubernetes_config_map" "api_config" {
 
     CORS_ORIGIN = "*"
 
-    DB_CONNECTION = "pgsql"
+    DB_CONNECTION = "mysql"
 
-    DB_HOST = "postgres"
+    DB_HOST = "mysql"
 
-    DB_PORT = "5432"
+    DB_PORT = "3306"
 
     DB_DATABASE = "ww_db"
 

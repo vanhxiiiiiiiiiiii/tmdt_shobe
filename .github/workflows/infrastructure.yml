@@ -4,17 +4,7 @@ env:
   TF_WORKDIR: ".infrastructure/azure/"
 
 on:
-  push:
-    branches:
-      - 2.x.x
-      - master
-    paths:
-      - ".infrastructure/azure/**.tf"
-  pull_request:
-    branches:
-      - 2.x.x
-    paths:
-      - ".infrastructure/azure/**.tf"
+  workflow_dispatch:
 
 jobs:
   plan:
@@ -117,7 +107,7 @@ jobs:
         run: exit 1
 
   apply:
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[tf-skip]') == false
+    if: github.event_name == 'workflow_dispatch'
 
     runs-on: ubuntu-latest
 

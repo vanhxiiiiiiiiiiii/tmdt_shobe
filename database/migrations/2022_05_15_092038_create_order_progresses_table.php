@@ -3,6 +3,7 @@
 use App\Enums\OrderStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('order_progresses', function (Blueprint $table) {
             $table->id();
-            $table->text('note')->default('');
+            $table->text('note')->default(DB::raw("('')"));
             $table->timestamp('created_at')->useCurrent();
 
             $table->foreignId('order_id')

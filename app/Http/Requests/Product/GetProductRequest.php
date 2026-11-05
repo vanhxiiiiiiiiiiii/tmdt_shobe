@@ -24,7 +24,8 @@ class GetProductRequest extends CustomFormRequest
     public function rules()
     {
         return [
-            'limit' => 'required|integer|min:1|max:20',
+            'limit' => 'sometimes|integer|min:1|max:20',
+            'page' => 'sometimes|integer|min:1',
         ];
     }
 }

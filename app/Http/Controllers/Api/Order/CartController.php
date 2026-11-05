@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\Order;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\AddToCartRequest;
-use App\Http\Requests\Order\GetCartRequest;
-use App\Models\Order\CartItem;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 
@@ -45,7 +43,7 @@ class CartController extends Controller
      */
     public function add(AddToCartRequest $request)
     {
-        $newPirce = $this->cartService->addItem(
+        $price = $this->cartService->addItem(
             $request->user()->id,
             $request->validated(),
         );
@@ -53,7 +51,7 @@ class CartController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Cart has been updated!',
-            'data' => $newPirce,
+            'data' => $price,
         ]);
     }
 
@@ -66,11 +64,7 @@ class CartController extends Controller
      */
     public function delete(Request $request, int $productModelId)
     {
-        CartItem::where([
-            ['user_id', $request->user()->id],
-            ['product_model_id', $productModelId],
-        ])
-            ->delete();
+        $this->cartService->removeItem($request->user()->id, $productModelId);
 
         return response()->json([
             'status' => true,

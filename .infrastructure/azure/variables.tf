@@ -26,7 +26,7 @@ variable "ssh_key" {
   type = string
 }
 
-variable "postgres_password" {
+variable "mysql_password" {
   type = string
 }
 

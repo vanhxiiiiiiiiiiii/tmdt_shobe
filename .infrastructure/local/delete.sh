@@ -1,6 +1,6 @@
 #!/bin/sh
 
-kubectl delete -f postgres
+kubectl delete -f mysql
 kubectl delete -f api
 kubectl delete -f adminer
 kubectl delete -f ingress

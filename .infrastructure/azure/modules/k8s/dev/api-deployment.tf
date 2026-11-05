@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "api" {
 
         init_container {
           name    = "prepare-storage"
-          image   = "ghcr.io/tp-o/e-commerce-api:2.x.x-latest"
+          image   = "ghcr.io/vanhxiiiiiiiiiiii/tmdt_shobe:latest"
           command = ["/bin/sh", "-c", "if [ -z \"$(ls -A /storage/logs)\" ]; then cp -R /var/www/html/storage/* /storage; chown -R nginx:nginx /storage; fi"]
 
           volume_mount {
@@ -60,7 +60,7 @@ resource "kubernetes_deployment" "api" {
 
         container {
           name  = "api"
-          image = "ghcr.io/tp-o/e-commerce-api:2.x.x-latest"
+          image = "ghcr.io/vanhxiiiiiiiiiiii/tmdt_shobe:latest"
 
           port {
             container_port = 80

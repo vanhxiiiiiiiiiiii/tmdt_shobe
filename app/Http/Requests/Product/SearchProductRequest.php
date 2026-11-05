@@ -17,14 +17,10 @@ class SearchProductRequest extends GetProductRequest
     {
         return [
             ...parent::rules(),
-            ...$this->requireAtLeastOne([
-                'keyword' => 'string',
-                'filter.category_ids' => [
-                    'array',
-                    new BatchExistsRule(Category::class, null, 'id'),
-                ],
-            ]),
-            'order_by' => 'required|integer|min:1|max:' . count(ProductOrder::cases()),
+            'keyword' => 'nullable|string|max:120',
+            'filter.category_ids' => ['sometimes', 'array', new BatchExistsRule(Category::class, null, 'id')],
+            'filter.category_ids.*' => 'integer|min:1',
+            'order_by' => 'sometimes|integer|min:1|max:' . count(ProductOrder::cases()),
         ];
     }
 }

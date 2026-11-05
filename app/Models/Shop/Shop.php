@@ -13,12 +13,17 @@ class Shop extends Model
 
     protected $fillable = [
         'id',
+        'seller_code',
+        'tax_code',
         'slug',
         'name',
         'description',
         'avatar_image',
         'cover_image',
         'banners',
+        'phone',
+        'email',
+        'is_active',
     ];
 
     protected $casts = [
@@ -45,5 +50,10 @@ class Shop extends Model
         return $this->hasMany(Product::class)
             ->where('status_id', ProductStatus::Published)
             ->with('models');
+    }
+
+    public function warehouses()
+    {
+        return $this->hasMany(\App\Models\Inventory\Warehouse::class);
     }
 }

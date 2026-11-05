@@ -27,7 +27,7 @@ return new class extends Migration
                 'credit_cardable_id',
                 'credit_cardable_type',
                 'card_number',
-            ]);
+            ], 'credit_cards_owner_number_unique');
         });
     }
 

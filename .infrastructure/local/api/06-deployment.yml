@@ -21,7 +21,7 @@ spec:
         fsGroup: 1000
       initContainers:
         - name: prepare-storage
-          image: ghcr.io/tp-o/e-commerce-api:2.x.x-latest
+          image: ghcr.io/vanhxiiiiiiiiiiii/tmdt_shobe:latest
           command:
             - "/bin/sh"
             - "-c"
@@ -34,7 +34,7 @@ spec:
               mountPath: /storage
       containers:
         - name: api
-          image: ghcr.io/tp-o/e-commerce-api:2.x.x-latest
+          image: ghcr.io/vanhxiiiiiiiiiiii/tmdt_shobe:latest
           ports:
             - containerPort: 80
           envFrom:
@@ -42,10 +42,6 @@ spec:
                 name: api-config
             - secretRef:
                 name: api-secret
-            - configMapRef:
-                name: postgres-config
-            - secretRef:
-                name: postgres-secret
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/conf.d/default.conf

@@ -4,6 +4,11 @@
 /.infrastructure
 /.vscode
 /.client
+/frontend
+.env
+.env.*
+storage/app/*.sql
+storage/app/*.sql.gz
 /vendor
 /docs
 !/.docker/api/entrypoint.sh

@@ -17,6 +17,7 @@ class CartItem extends Model
     public $incrementing = false;
 
     protected $fillable = [
+        'cart_id',
         'user_id',
         'product_model_id',
         'quantity',

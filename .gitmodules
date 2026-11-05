@@ -1,4 +1,0 @@
-[submodule ".client"]
-	path = .client
-	url = https://github.com/thuongtruong1009/e-shopee
-	branch = main

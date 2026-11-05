@@ -29,7 +29,7 @@ class ReadyOrderRequest extends UpdateProgressRequest
     public function rules()
     {
         return [
-            ...parent::rules(),
+            'note' => 'nullable|string',
             'pickup_address_id' => [
                 'required',
                 'integer',

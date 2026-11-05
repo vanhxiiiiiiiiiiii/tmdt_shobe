@@ -1,0 +1,118 @@
+@import './markdown.css';
+
+/*-----------------------------------------------------------------------------------
+
+    Project Name: e-shopee
+    Project URL: https://github.com/thuongtruong1009/e-shopee
+    Description: Online shopping application and e-commerce trading platform.
+    Author: thuongtruong1009
+    Author URL: https://github.com/thuongtruong1009
+    Version: 2.1
+
+-----------------------------------------------------------------------------------*/
+
+/* @font-face {
+  font-family: "Gilroy-Bold ☞";
+  font-style: normal;
+  font-weight: 700;
+  src: local("Gilroy-Bold ☞"), url("../fonts/Gilroy-Bold.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Gilroy-Heavy ☞";
+  font-style: normal;
+  font-weight: 900;
+  src: local("Gilroy-Heavy ☞"), url("../fonts/Gilroy-Heavy.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Gilroy-Light ☞";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Gilroy-Light ☞"), url("../fonts/Gilroy-Light.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Gilroy-Medium ☞";
+  font-style: normal;
+  font-weight: 500;
+  src: local("Gilroy-Medium ☞"), url("../fonts/Gilroy-Medium.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Gilroy-Regular ☞";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Gilroy-Regular ☞"), url("../fonts/Gilroy-Regular.woff") format("woff");
+} */
+
+*{
+  scroll-behavior: smooth;
+	/* margin: 0;
+	padding: 0;
+	box-sizing: border-box; */
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-scroll-behavior: smooth;
+  -moz-user-scroll-behavior: smooth;
+  -ms-user-scroll-behavior: smooth;
+}
+
+html.dark {
+  background: #121212;
+  transition: 0.3s;
+}
+input, select, textarea{
+  outline: none;
+}
+
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  @apply bg-teal-600 opacity-75;
+
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+
+.btn {
+  @apply px-4 py-1 rounded inline-block
+    bg-teal-600 text-white cursor-pointer
+    hover:bg-teal-700
+    disabled:cursor-default disabled:bg-gray-600 disabled:opacity-50;
+}
+
+.icon-btn {
+  @apply inline-block cursor-pointer select-none
+    opacity-75 transition duration-200 ease-in-out
+    hover:opacity-100 hover:text-teal-600;
+  font-size: 0.9em;
+}
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar,
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #EE7600;
+  border-radius: 300px;
+}

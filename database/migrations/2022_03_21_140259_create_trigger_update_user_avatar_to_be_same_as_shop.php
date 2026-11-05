@@ -12,26 +12,19 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::unprepared("
-            CREATE OR REPLACE FUNCTION update_user_avatar_to_be_same_as_shop()
-            RETURNS TRIGGER AS
-            $$
+        DB::unprepared('CREATE TRIGGER update_user_avatar_to_be_same_as_shop
+            AFTER UPDATE ON shops
+            FOR EACH ROW
             BEGIN
-                IF OLD.avatar_image <> NEW.avatar_image THEN
+                IF COALESCE(@syncing_avatar, 0) = 0
+                    AND NOT (OLD.avatar_image <=> NEW.avatar_image) THEN
+                    SET @syncing_avatar = 1;
                     UPDATE user_profiles
                     SET avatar_image = NEW.avatar_image
                     WHERE user_profiles.user_id = OLD.id;
+                    SET @syncing_avatar = 0;
                 END IF;
-
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-
-            CREATE TRIGGER update_user_avatar_to_be_same_as_shop
-            AFTER UPDATE ON shops
-            FOR EACH ROW
-            EXECUTE PROCEDURE update_user_avatar_to_be_same_as_shop();
-        ");
+            END');
     }
 
     /**
@@ -41,9 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::unprepared('
-            DROP TRIGGER IF EXISTS update_user_avatar_to_be_same_as_shop ON shops;
-            DROP FUNCTION IF EXISTS update_user_avatar_to_be_same_as_shop;
-        ');
+        DB::unprepared('DROP TRIGGER IF EXISTS update_user_avatar_to_be_same_as_shop');
     }
 };

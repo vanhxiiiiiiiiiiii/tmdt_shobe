@@ -31,6 +31,8 @@ class CreateProductRequest extends CreateOrUpdateProductRequest
             'name' => 'required|string|min:10|max:255',
             'description' => 'string|min:50',
             'weight' => 'required|numeric|min:0.1|max:999999',
+            'cost_price' => 'nullable|numeric|min:0',
+            'unit' => 'nullable|string|max:30',
             'images' => 'required|array|min:1|max:9',
             'images.*' => [
                 'string',
@@ -76,7 +78,7 @@ class CreateProductRequest extends CreateOrUpdateProductRequest
                 new ValidProducModelVariationIndexesRule('variations', 'variation_index'),
             ],
             'models.*.sku' => 'nullable|string',
-            'models.*.price' => 'numeric|min:0.5',
+            'models.*.price' => 'required|numeric|min:0.5|max:999999.99',
             'models.*.stock' => 'required|integer|min:0',
             'models.*.variation_index' => 'array|max:2',
             'models.*.variation_index.*' => 'integer|min:0',

@@ -2,78 +2,74 @@
 
 namespace App\Services;
 
-use App\Enums\Pagination;
+use App\Enums\ProductStatus;
+use App\Models\Account\User\User;
 use App\Models\Order\CartItem;
+use App\Models\Product\ProductModel;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class CartService
 {
-    private ProductService $productService;
-
-    public function __construct(ProductService $productService)
-    {
-        $this->productService = $productService;
-    }
-
-    /**
-     * Get all items in cart of the user.
-     *
-     * @param int $userId
-     * @return \Illuminate\Support\Collection
-     */
     public function getItems(int $userId)
     {
-        $cart = CartItem::where('user_id', $userId)
-            ->with([
-                'shop',
-                'product',
-                'productModel',
-            ])
-            ->get();
-
-        $prices = $this->productService->getPrices($cart->toArray());
-
-        $cart->transform(function ($item, $key) use ($prices) {
-            $item->total_price = $prices[$key]['total_price'];
-            $item->final_total_price = $prices[$key]['final_total_price'];
-
-            return $item;
-        });
-
-        return $cart;
+        return CartItem::where('user_id', $userId)
+            ->with(['shop', 'product', 'productModel.wholesalePirces', 'productModel.inventoryStocks.warehouse'])
+            ->orderBy('product_model_id')->get()->each(function (CartItem $item) {
+                $available = $item->productModel?->availableQuantity() ?? 0;
+                $price = $item->productModel?->unitPriceFor($item->quantity) ?? 0;
+                $item->unit_price = $price;
+                $item->available_quantity = $available;
+                $item->total_price = $item->final_total_price = round($price * $item->quantity, 2);
+                $item->unavailable_reason = match (true) {
+                    !$item->productModel, !$item->product?->shop_id,
+                    (int) $item->product?->status_id !== ProductStatus::Published->value => 'Sản phẩm không còn bán.',
+                    $available <= 0 => 'Sản phẩm đã hết hàng.',
+                    $item->quantity > $available => "Chỉ còn {$available} sản phẩm.",
+                    default => null,
+                };
+            });
     }
 
-    /**
-     * Add item to cart of the user.
-     *
-     * @param int $userId
-     * @param array $cartItemData
-     * @return void
-     */
-    public function addItem(int $userId, array $cartItemData)
+    public function addItem(int $userId, array $data)
     {
-        $cartItem = CartItem::where([
-            ['user_id', $userId],
-            ['product_model_id', $cartItemData['product_model_id']],
-        ])
-            ->first();
+        return DB::transaction(function () use ($userId, $data) {
+            User::whereKey($userId)->lockForUpdate()->firstOrFail();
+            $model = ProductModel::whereKey($data['product_model_id'])
+                ->with(['product', 'inventoryStocks.warehouse', 'wholesalePirces'])->lockForUpdate()->first();
 
-        if (is_null($cartItem)) {
-            CartItem::create([
-                ...$cartItemData,
-                'user_id' => $userId,
-            ]);
-        } else {
-            CartItem::where([
-                ['user_id', $userId],
-                ['product_model_id', $cartItemData['product_model_id']],
-            ])
-                ->update([
-                    'quantity' => $cartItemData['quantity'],
+            if (!$model?->product?->shop_id || (int) $model->product->status_id !== ProductStatus::Published->value
+                || $data['quantity'] > $model->availableQuantity()) {
+                throw ValidationException::withMessages(['quantity' => 'Sản phẩm không còn bán hoặc không đủ tồn kho.']);
+            }
+
+            $cartId = DB::table('carts')->where('user_id', $userId)->where('status', 'active')->value('id')
+                ?? DB::table('carts')->insertGetId([
+                    'user_id' => $userId,
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
-        }
 
-        $prices = $this->productService->getPrices([$cartItemData]);
+            $item = CartItem::where('user_id', $userId)->where('product_model_id', $model->id);
+            if ($item->exists()) {
+                $item->update(['quantity' => $data['quantity'], 'cart_id' => $cartId]);
+            } else {
+                CartItem::create([...$data, 'user_id' => $userId, 'cart_id' => $cartId]);
+            }
 
-        return $prices[0];
+            $price = $model->unitPriceFor($data['quantity']);
+
+            return ['unit_price' => $price, 'total_price' => round($price * $data['quantity'], 2),
+                'final_total_price' => round($price * $data['quantity'], 2)];
+        }, 3);
+    }
+
+    public function removeItem(int $userId, int $modelId): void
+    {
+        DB::transaction(function () use ($userId, $modelId) {
+            User::whereKey($userId)->lockForUpdate()->firstOrFail();
+            CartItem::where('user_id', $userId)->where('product_model_id', $modelId)->delete();
+        }, 3);
     }
 }

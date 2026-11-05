@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,10 +17,10 @@ return new class extends Migration
         Schema::create('shops', function (Blueprint $table) {
             $table->string('slug', 40)->unique();
             $table->string('name', 30);
-            $table->text('description')->default('');
+            $table->text('description')->default(DB::raw("('')"));
             $table->string('avatar_image', 255)->nullable();
             $table->string('cover_image', 255)->nullable();
-            $table->text('banners')->default('["images":[],"videos":[]]');
+            $table->text('banners')->default(DB::raw("('[]')"));
             $table->timestamp('created_at')->useCurrent();
 
             $table->foreignId('id')

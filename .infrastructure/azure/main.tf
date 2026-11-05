@@ -43,7 +43,7 @@ module "dev-k8s" {
   client_certificate     = base64decode(module.cluster.client_certificate)
   client_key             = base64decode(module.cluster.client_key)
   cluster_ca_certificate = base64decode(module.cluster.cluster_ca_certificate)
-  postgres_password      = var.postgres_password
+  mysql_password         = var.mysql_password
   app_key                = var.app_key
   mail_password          = var.mail_password
   facebook_client_id     = var.facebook_client_id

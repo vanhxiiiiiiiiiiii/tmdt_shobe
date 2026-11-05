@@ -1,124 +1,81 @@
-name: CICD
+name: E-shopee CI
 
 on:
   push:
-    branches:
-      - 2.x.x
-      - master
-    paths-ignore:
-      - '.vscode/**'
-      - '.infrastructure/**'
-      - 'docs/**'
-      - 'storage/**'
-      - '.editorconfig'
-      - '**.md'
+    branches: [main, master, 2.x.x]
   pull_request:
-    branches:
-      - 2.x.x
-    paths-ignore:
-      - '.vscode/**'
-      - '.infrastructure/**'
-      - 'storage/**'
-      - '.editorconfig'
-      - '**.md'
+    branches: [main, master, 2.x.x]
+  workflow_dispatch:
 
-env:
-  GHCR_REGISTRY: ghcr.io
-  BRANCH: ${{ github.ref }}
-  IMAGE: ${{ github.repository }}
-  COMMIT_SHA: ${{ github.sha }}
-  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+permissions:
+  contents: read
 
 jobs:
-  php-lint:
+  backend:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v2
-
-      - name: Use phplint
-        uses: overtrue/phplint@8.1
-        with:
-          path: .
-          options: --exclude=*.log
-
-  build-image:
-    needs:
-      - php-lint
-
-    if: github.event_name == 'push'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v1
-        with:
-          registry: ${{ env.GHCR_REGISTRY }}
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }}
-
-      - name: Set lower case image name
-        run: |
-          echo "IMAGE=${IMAGE,,}" >>${GITHUB_ENV}
-
-      - name: Create tags
-        id: tags
-        run: |
-          if [ "${{ env.BRANCH }}" == "refs/heads/2.x.x" ]; then
-            echo "::set-output name=tags::\
-            ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE }}:2.x.x-latest, \
-            ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE }}:2.x.x-${{ env.COMMIT_SHA }}"
-          else
-            echo "::set-output name=tags::\
-            ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE }}:latest,\
-            ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE }}:${{ env.COMMIT_MESSAGE }}"
-          fi
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ steps.tags.outputs.tags }}
-
-  deploy-dev:
-    needs:
-      - build-image
-
-    if: github.ref == 'refs/heads/2.x.x' && contains(github.event.head_commit.message, '[cd-skip]') == false
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set lower case image name
-        run: |
-          echo "IMAGE=${IMAGE,,}" >>${GITHUB_ENV}
-
-      - name: Deploy
-        uses: actions-hub/kubectl@master
+    services:
+      mysql:
+        image: mysql:8.4
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-        with:
-          args: |
-            set image deployment/api api=${{ env.GHCR_REGISTRY }}/${{ env.IMAGE }}:2.x.x-${{ env.COMMIT_SHA }}
-
-  deploy-production:
-    needs:
-      - build-image
-
-    if: github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, '[cd-skip]') == false
-
-    runs-on: ubuntu-latest
-
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: eshopee_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -ptesting"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: eshopee_test
+      DB_USERNAME: root
+      DB_PASSWORD: testing
+      REPORT_CACHE_STORE: array
+      CACHE_STORE: array
+      CACHE_DRIVER: array
+      RUN_MYSQL_CHECKOUT_TESTS: '1'
     steps:
-      - name: Deploy
-        run: echo "Not yet"
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, mbstring, gd, bcmath
+          coverage: none
+          tools: composer:v2
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      - name: Check PHP syntax
+        run: find app config database routes tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Prepare application
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          mysql -h 127.0.0.1 -uroot -ptesting -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+          php artisan migrate --force
+          php artisan db:seed --class=ProductStatusSeeder --force
+          php artisan db:seed --class=OrderStatusSeeder --force
+      - name: Run tests
+        run: php artisan test --no-ansi
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      CYPRESS_INSTALL_BINARY: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pnpm
+        run: npm install --global pnpm@9.15.9
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Vue application
+        run: pnpm build

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -18,7 +19,7 @@ return new class extends Migration
             $table->string('sku', 255)->nullable();
             $table->float('price', 8, 2, true);
             $table->integer('stock', false, true)->default(0);
-            $table->text('variation_index')->default('[]');
+            $table->text('variation_index')->default(DB::raw("('[]')"));
             $table->boolean('is_default')->default(false);
 
             $table->foreignId('product_id')

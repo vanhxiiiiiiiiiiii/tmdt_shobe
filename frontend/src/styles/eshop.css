@@ -1,0 +1,60 @@
+:root {
+  --es-bg: #f5f5f4;
+  --es-surface: #fff;
+  --es-ink: #292524;
+  --es-muted: #57534e;
+  --es-line: #e7e5e4;
+  --es-accent: #bc3916;
+  --es-soft: #fff1e9;
+  --es-radius: 12px;
+  --es-space: 16px;
+}
+.es-shell { min-height: 100vh; background: var(--es-bg); color: var(--es-ink); font: 1rem/1.55 system-ui, sans-serif; }
+.es-page { width: min(1200px, 100%); margin: auto; padding: 24px var(--es-space) 48px; }
+.es-page h1 { font-size: clamp(1.55rem, 3vw, 2.15rem); font-weight: 750; margin-bottom: 16px; }
+.es-panel { padding: var(--es-space); background: var(--es-surface); border: 1px solid var(--es-line); border-radius: var(--es-radius); }
+.es-header { background: var(--es-surface); border-bottom: 1px solid var(--es-line); }
+.es-header .es-page { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding-block: 12px; }
+.es-brand { font-size: 1.4rem; font-weight: 800; color: var(--es-accent); }
+.es-search { display: flex; flex: 1 1 280px; gap: 8px; min-width: 0; }
+.es-search input { flex: 1; min-width: 0; }
+.es-nav { display: flex; gap: 16px; flex-wrap: wrap; }
+.es-shell :is(input:not([type=checkbox]), select) { border: 1px solid var(--es-line); padding: 8px; border-radius: 8px; background: var(--es-surface); }
+.es-shell :is(a, button, input, select):focus-visible { outline: 2px solid var(--es-accent); outline-offset: 3px; }
+.es-shell input[type=checkbox] { accent-color: var(--es-accent); width: 18px; height: 18px; vertical-align: middle; }
+.es-shell button:disabled { cursor: not-allowed; opacity: .48; }
+.es-primary { color: white; background: var(--es-accent); font-weight: 650; padding: 10px 18px; min-height: 44px; border-radius: 8px; }
+.es-hero { padding: clamp(24px, 5vw, 64px); background: var(--es-soft); border-radius: var(--es-radius); }
+.es-hero p { margin-bottom: 20px; color: var(--es-muted); }
+.es-section { margin-top: 24px; }
+.es-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
+.es-categories { display: flex; flex-wrap: wrap; gap: 8px; }
+.es-categories a { border: 1px solid var(--es-line); border-radius: 8px; padding: 10px 14px; }
+.es-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.es-grid > * { min-width: 0; }
+.es-card { display: flex; height: 100%; flex-direction: column; overflow: hidden; border-radius: var(--es-radius); border: 1px solid var(--es-line); background: var(--es-surface); transition: box-shadow 160ms, border-color 160ms; }
+.es-card:hover { border-color: var(--es-accent); box-shadow: 0 4px 14px #29252418; }
+.es-card img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--es-bg); }
+.es-card-body { display: grid; gap: 4px; padding: 12px; }
+.es-card-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; min-height: 3.1em; }
+.es-price { color: var(--es-accent); font-weight: 700; }
+.es-shop { margin-bottom: var(--es-space); }
+.es-shop-name { display: flex; gap: 10px; align-items: center; font-weight: 700; padding-bottom: 12px; }
+.es-cart-row, .es-cart-head { display: grid; grid-template-columns: minmax(0, 3fr) repeat(3,minmax(0, 1fr)) auto; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--es-line); }
+.es-cart-head, .es-cart-product small { color: var(--es-muted); }
+.es-cart-product { display: flex; align-items: center; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.es-cart-product img { width: 64px; aspect-ratio: 1; object-fit: contain; }
+.es-cart-product small { display: block; }
+.es-stepper { display: flex; align-items: center; gap: 8px; }
+.es-stepper button { border: 1px solid var(--es-line); border-radius: 6px; min-width: 36px; min-height: 36px; }
+.es-cart-total { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; position: sticky; bottom: 0; z-index: 2; box-shadow: 0 -4px 16px #29252412; }
+.es-cart-total p { margin-inline-start: auto; }
+@media (min-width: 700px) { .es-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (min-width: 1100px) { .es-grid { grid-template-columns: repeat(5,minmax(0,1fr)); } }
+@media (max-width: 699px) {
+  .es-cart-head { display: none; }
+  .es-cart-row { display: flex; flex-wrap: wrap; }
+  .es-cart-product { flex-basis: 100%; }
+  .es-cart-total { position: static; }
+}
+@media (prefers-reduced-motion: reduce) { .es-shell * { transition: none !important; } }

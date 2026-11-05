@@ -20,8 +20,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 
     protected $fillable = [
         'username',
+        'customer_code',
+        'national_id',
         'email',
         'password',
+        'account_status',
     ];
 
     protected $hidden = [
@@ -66,5 +69,15 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     {
         return $this->hasMany(CartItem::class)
             ->with(['product', 'productModel']);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order\Order::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(\App\Models\Product\Favorite::class);
     }
 }

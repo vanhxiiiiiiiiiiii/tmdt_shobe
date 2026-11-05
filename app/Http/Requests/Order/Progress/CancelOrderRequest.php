@@ -14,20 +14,17 @@ class CancelOrderRequest extends UpdateProgressRequest
      */
     public function authorize()
     {
-        $isUserAllowed = $this->user()->id === $this->route('order')->user_id &&
-            $this->route('order')->status_id === OrderStatus::Processing->value;
+        if ($this->is('api/v2/user/orders/*')) {
+            return get_class($this->user()) === AccountType::User->value
+                && $this->user()->id === $this->route('order')->user_id
+                && $this->route('order')->status_id === OrderStatus::Processing->value;
+        }
 
-        $isShopAllowed = $this->user()->id === $this->route('order')->shop_id &&
-            ($this->route('order')->status_id === OrderStatus::Processing->value ||
-                $this->route('order')->status_id === OrderStatus::Ready->value
-            );
+        return parent::authorize();
+    }
 
-
-        return parent::authorize() ||
-            (get_class($this->user()) === AccountType::User->value &&
-                ($isUserAllowed ||
-                    $isShopAllowed
-                )
-            );
+    public function rules()
+    {
+        return ['note' => 'nullable|string'];
     }
 }

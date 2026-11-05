@@ -69,6 +69,7 @@ class ValidProductAttributesRule implements Rule, DataAwareRule
         $categories->each(function ($category) use (&$categoryAttributes) {
             $categoryAttributes = $categoryAttributes->concat($category['attributes']);
         });
+        $categoryAttributes = $categoryAttributes->sortByDesc('is_required')->unique('id')->values();
 
         // Check if the redundant attributes are provided
         if (

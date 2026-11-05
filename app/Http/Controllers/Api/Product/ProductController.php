@@ -13,6 +13,9 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product\Product;
 use App\Services\ProductService;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class ProductController extends Controller
@@ -48,7 +51,9 @@ class ProductController extends Controller
                 'models',
                 'wholesalePrices',
                 'shop',
+                'categories',
             ])
+            ->withCount('reviews')
             ->firstOrFail();
 
         return response()->json([
@@ -65,8 +70,11 @@ class ProductController extends Controller
      */
     public function feature(GetProductRequest $request)
     {
-        $featuredProducts = Product::with('models')
-            ->paginate($request->input('limit') ?? Pagination::Default);
+        $featuredProducts = Product::where('status_id', ProductStatus::Published->value)
+            ->with('models')
+            ->orderByRaw("CASE WHEN JSON_VALID(images) THEN COALESCE(JSON_LENGTH(images), 0) > 0 ELSE 0 END DESC")
+            ->orderByDesc('id')
+            ->paginate($request->input('limit') ?? Pagination::Default->value);
 
         return response()->json([
             'status' => true,
@@ -106,7 +114,8 @@ class ProductController extends Controller
             ['status_id', ProductStatus::Published],
         ])
             ->with('models')
-            ->paginate($request->input('limit') ?? Pagination::Default);
+            ->orderByDesc('id')
+            ->paginate($request->input('limit') ?? Pagination::Default->value);
 
         return response()->json([
             'status' => true,
@@ -122,16 +131,80 @@ class ProductController extends Controller
      */
     public function belongToShop(GetProductRequest $request)
     {
-        $products = Product::where([
-            ['shop_id', request()->user()->id],
-            ['status_id', '<>', ProductStatus::Deleted],
-        ])
-            ->paginate($request->input('limit') ?? Pagination::Default);
+        abort_unless($request->user()->shop, 403);
+        $filters = $request->validate([
+            'keyword' => 'nullable|string|max:120',
+            'status' => 'sometimes|in:all,online,out-of-stock,hidden',
+        ]);
+
+        $query = Product::where('shop_id', $request->user()->id)
+            ->where('status_id', '<>', ProductStatus::Deleted->value);
+
+        if ($keyword = $filters['keyword'] ?? null) {
+            $pattern = '%' . $keyword . '%';
+            $query->where(fn ($products) => $products->where('name', 'like', $pattern)
+                ->orWhere('product_code', 'like', $pattern)
+                ->orWhereHas('models', fn ($models) => $models->where('sku', 'like', $pattern)));
+        }
+
+        $status = $filters['status'] ?? 'all';
+        if ($status === 'hidden') {
+            $query->where('status_id', ProductStatus::Delisted->value);
+        } elseif ($status === 'online') {
+            $query->where('status_id', ProductStatus::Published->value);
+        } elseif ($status === 'out-of-stock') {
+            $query->whereDoesntHave('models', fn ($models) => $models->where('stock', '>', 0));
+        }
+
+        $products = $query->with(['models', 'categories'])->orderByDesc('id')
+            ->paginate($request->input('limit') ?? Pagination::Default->value);
 
         return response()->json([
             'status' => true,
             'data' => $products,
         ]);
+    }
+
+    public function updateListing(Request $request, Product $product)
+    {
+        abort_unless(
+            $request->user()->shop && $product->shop_id === $request->user()->id
+            && $product->status_id !== ProductStatus::Deleted->value,
+            403,
+        );
+
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string|max:10000',
+            'weight' => 'sometimes|required|numeric|min:0.1|max:999999',
+            'is_published' => 'sometimes|required|boolean',
+            'model_prices' => 'sometimes|array',
+            'model_prices.*.id' => 'required|integer|min:1|distinct',
+            'model_prices.*.price' => 'required|numeric|min:0.5|max:999999.99',
+        ]);
+        if (array_key_exists('description', $data)) {
+            $data['description'] ??= '';
+        }
+        if (array_key_exists('is_published', $data)) {
+            $data['status_id'] = $data['is_published'] ? ProductStatus::Published : ProductStatus::Delisted;
+            unset($data['is_published']);
+        }
+        $prices = $data['model_prices'] ?? [];
+        unset($data['model_prices']);
+        DB::transaction(function () use ($product, $data, $prices) {
+            $listing = Product::whereKey($product->id)->lockForUpdate()->firstOrFail();
+            abort_if($listing->status_id === ProductStatus::Deleted->value, 403);
+            foreach ($prices as $price) {
+                $model = $listing->models()->whereKey($price['id'])->first();
+                if (!$model) {
+                    throw ValidationException::withMessages(['model_prices' => 'The variant does not belong to this product.']);
+                }
+                $model->update(['price' => $price['price']]);
+            }
+            $listing->update($data);
+        }, 3);
+
+        return response()->json(['status' => true, 'data' => $product->fresh('models')]);
     }
 
     /**

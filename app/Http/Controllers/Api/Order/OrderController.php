@@ -9,6 +9,7 @@ use App\Http\Requests\Order\GetOrderListRequest;
 use App\Models\Order\Order;
 use App\Services\OrderService;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -34,10 +35,14 @@ class OrderController extends Controller
             ['id', $id],
         ])
             ->with([
+                'items.product',
                 'product',
                 'receivedAddress',
                 'pickupAddress',
                 'progresses',
+                'payments',
+                'shipment',
+                'voucher',
             ])
             ->firstOrFail();
 
@@ -65,8 +70,9 @@ class OrderController extends Controller
             ]);
 
         $orders = $orders
-            ->with(['product', 'receivedAddress', 'pickupAddress'])
-            ->paginate($orderQuery['limit'] ?? Pagination::Default);
+            ->orderByDesc('id')
+            ->with(['items', 'product', 'receivedAddress', 'pickupAddress', 'payments', 'shipment'])
+            ->paginate($orderQuery['limit'] ?? Pagination::Default->value);
 
         return response()->json([
             'status' => true,
@@ -82,6 +88,7 @@ class OrderController extends Controller
      */
     public function belongToShop(GetOrderListRequest $request)
     {
+        abort_unless($request->user()->shop, 403);
         $orderQuery = $request->validated();
 
         $orders = !isset($orderQuery['status_id'])
@@ -92,8 +99,9 @@ class OrderController extends Controller
             ]);
 
         $orders = $orders
-            ->with(['product', 'receivedAddress'])
-            ->paginate($orderQuery['limit'] ?? Pagination::Default);
+            ->orderByDesc('id')
+            ->with(['items', 'product', 'receivedAddress', 'payments', 'shipment'])
+            ->paginate($orderQuery['limit'] ?? Pagination::Default->value);
 
         return response()->json([
             'status' => true,
@@ -107,9 +115,21 @@ class OrderController extends Controller
      * @param \App\Http\Requests\Order\CreateOrderRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function quote(Request $request)
+    {
+        $data = $request->validate([
+            'voucher_code' => 'nullable|string|max:50',
+            'model_ids' => 'sometimes|array|min:1|max:100',
+            'model_ids.*' => 'required|integer|min:1|distinct',
+        ]);
+
+        return response()->json(['status' => true,
+            'data' => $this->orderService->quote($request->user()->id, $data['voucher_code'] ?? null, $data['model_ids'] ?? null)]);
+    }
+
     public function create(CreateOrderRequest $request)
     {
-        $this->orderService->create(
+        $orders = $this->orderService->create(
             $request->user()->id,
             $request->validated(),
         );
@@ -117,6 +137,7 @@ class OrderController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Orders have been created!',
+            'data' => $orders,
         ], Response::HTTP_CREATED);
     }
 }

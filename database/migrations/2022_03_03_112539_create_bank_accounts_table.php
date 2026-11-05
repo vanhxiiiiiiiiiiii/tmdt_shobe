@@ -26,7 +26,7 @@ return new class extends Migration
                 'bank_accountable_id',
                 'bank_accountable_type',
                 'account_number',
-            ]);
+            ], 'bank_accounts_owner_number_unique');
         });
     }
 

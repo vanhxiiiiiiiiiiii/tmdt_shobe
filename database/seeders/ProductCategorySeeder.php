@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Services\ProductCategoryService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -658,5 +659,7 @@ class ProductCategorySeeder extends Seeder
                 'name' => 'Laptops',
             ],
         ]);
+
+        app(ProductCategoryService::class)->refreshChildrenCounts();
     }
 }

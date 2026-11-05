@@ -14,7 +14,7 @@ variable "cluster_ca_certificate" {
   type = string
 }
 
-variable "postgres_password" {
+variable "mysql_password" {
   type = string
 }
 

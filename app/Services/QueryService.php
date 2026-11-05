@@ -21,31 +21,21 @@ class QueryService
             return 0;
         }
 
-        $tempTable = 'temp_tb';
-        $columns = join(',', array_keys($values[0]));
-        $changes = join(',', array_map(function ($column) use ($tempTable) {
-            return "$column = $tempTable.$column";
-        }, array_keys($values[0])));
-        $newValues = join(',', array_map(function ($value) use ($callback) {
+        $newValues = array_map(function ($value) use ($callback) {
             if (!is_null($callback)) {
                 $value = $callback($value);
             }
 
-            $newValue = array_map(function ($val) {
-                return is_string($val)
-                    ? '\'' . str_replace('\'', '\'\'', $val) . '\''
-                    : $val;
-            }, $value);
+            return $value;
+        }, $values);
 
-            return '(' . join(',', $newValue) . ')';
-        }, $values));
+        $updatedColumns = array_values(array_filter(
+            array_keys($newValues[0]),
+            fn ($column) => $column !== $primaryKey,
+        ));
 
-        return DB::update(
-            "
-            UPDATE $table
-            SET $changes
-            FROM (values $newValues) as $tempTable ($columns)
-            WHERE $table.$primaryKey = $tempTable.$primaryKey;",
-        );
+        return DB::transaction(function () use ($table, $newValues, $primaryKey, $updatedColumns) {
+            return DB::table($table)->upsert($newValues, [$primaryKey], $updatedColumns);
+        });
     }
 }

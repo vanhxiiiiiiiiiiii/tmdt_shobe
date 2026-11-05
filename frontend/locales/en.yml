@@ -1,0 +1,485 @@
+pagination:
+  previous: Previous
+  next: Next
+button:
+  about: About
+  back: Back
+  go: GO
+  home: Home
+  toggle_dark: Toggle dark mode
+  toggle_langs: Change languages
+cloading:
+  loading: Loading data
+ctrending:
+  search: search trending for us
+  see-more: See more
+  products: products
+ctoday:
+  hint: Hint today
+  sold: Solded
+  see-more: See more
+  decrease: DECREASE
+cmonthsale:
+  download: Download e-shopee app to immediately receive gifts from us
+  get-gift: Get gifts and exclusive deals now
+carrival:
+  our-products: Our Products
+  add-our-product: Add our products to weekly line up
+  new: new
+caccount: 
+  dashboard: Dashboard
+  orders: Orders
+  download: Download
+  payment-method: Payment Method
+  credit-card: Credit Card
+  address: Address
+  Logout: Logout
+ccategory:
+  men-fashion: Men's Fashion
+  women-fashion: Women's Fashion
+  phones-accessories: Phones & Accessories
+  mother-baby: Mother & Baby
+  electronic-device: Electronic device
+  home-life: Home & Life
+  computers-laptops: Computers & Laptops
+  beauty: Beauty
+  camera-camcorder: Camera Camcorder
+  health: Health
+  watch: Watch
+  women-shoes: Women's shoes
+  men-shoes: Men's shoes
+  women-purse-bags: Women's Purse Bags
+  household-electrical-appliances: Household electrical appliances
+  women-accessories-jewelry: Women's Accessories & Jewelry
+  sports-travel: Sports & Travel
+  online-store: Online Store
+  cars-motorcycles-bicycles: Cars & Motorcycles & Bicycles
+  online-bookstore: Online Bookstore
+  men-backpacks-wallets: Men's Backpacks & Wallets
+  child-fashion: Child fashion
+  toy: Toy
+  laundry-home-care: Laundry & Home Care
+  take-care-of-the-pet: Take care of the pet
+  vouchers-services: Vouchers & Services
+cpopular:
+  label: TOP POPULAR SEARCH PRODUCTS
+  see-all: See all
+  solded: Solded
+  month: month
+cflashsale:
+  label: FLASH SALES
+  see-all: See all
+  decrease: DECREASE
+  solded: Solded
+menu:
+  admin: Admin
+  about-page: About Page
+  b-cart-page: Cart Page
+  b-order-page: Order Page
+  b-filter-page: Filter Page
+  b-login-page: Login Page
+  b-account-page: Account Page
+  b-wishlist-page: Wishlist Page
+  become-seller: Become Seller
+  notifications: Notifications
+  notifications-warn: No have recent notifications
+  notifications-go: Open notifications center
+  register: Register
+  login: Login
+  s-home: home
+  s-dashboard: Dashboard
+  s-all-orders: All orders
+  s-order-canceled: Order canceled
+  s-all-products: All products
+  s-add-products: Add products
+  s-shop-preview: Shop preview
+  s-shop-edit-profile: Shop edit profile
+  s-shop-new-register: Shop new register
+  s-admin-channel: Admin channel
+  s-sign-out: Sign out
+  s-seller: Seller
+header:
+  home: Home
+  shop: Shop
+  pages: Pages
+  blog: Blog
+  contact: Contact
+  setting: Setting
+  vnd: VND
+  rub: RUB
+  pound: Pound
+  usd: USD
+  euro: Euro
+  jp: JP
+  rup: Rupee
+  rmb: RMB
+  my ccount: My Account
+  checkout: Checkout
+  download: Download
+  login: Login
+  sign out: Sign out
+  categories: Categories
+  placeholder search: Enter your search key...
+footer:
+  commit: We are always committed to serving you with the best services. Connect to receive more offers immediately.
+  help: NEED HELP?
+  copyright: Copyright
+  all rights reserved: All Rights Reserved
+  information: INFORMATION
+  delivery: Delivery
+  about us: About Us
+  secure payment: Secure Payment
+  contact us: Contact Us
+  sitemap: Sitemap
+  stores: Stores
+  link: LINKS
+  privacy policy: Privacy Policy
+  term of service: Term of Service
+  service requirement: Service Requirement
+  best sales: Best Sales
+  login: Login
+  my account: My Account
+  newsletter: NEWSLETTER
+  subscribe: You may unsubscribe at any moment. For that purpose, please find our contact info in the legal notice.
+  sign up today: Be the First to Know. Sign up for newsletter today!
+  sign up: Sign up
+service:
+  shipping-title: Shipping support
+  shipping-desc: Always update status
+  return-title: Free returns
+  return-desc: Free within 9 days
+  contact-title: Support
+  contact-desc: Ready to contact anywhen
+  payment-secure-title: Payment Secure
+  payment-secure-desc: Easy and convenient.
+  chat-title: Live chat
+  chat-desc: Share exchange with seller
+auth:
+  a-banner: Professional admin
+  a-desc: Manage your shop more effectively and visualization on e-shopee with Admin channel
+  a-title: Login to Admin channel
+  a-remember: Remember me
+  a-login: Login
+  b-register-title: Create Account
+  b-register-desc: Join us and start shopping in your style
+  b-register-btn: Create Account
+  b-register-refer: Login
+  b-register-already-account: Already have account
+  b-login-welcome: Welcome back
+  b-login-desc: Experience many attractive offers and services
+  b-oauth: or use email for login
+  b-not-account: Don't have account
+  b-login-forgot: Forgot password
+  b-login-btn: SIGN IN
+  b-forgot-title: You forgot you password
+  b-forgot-invite: It's easy to reset a new password in a snap
+  b-forgot: Forgot
+  b-forgot-form-title: Forgot password
+  b-forgot-form-desc: Please enter your username or email address. You will received a link to create a new password via email
+  b-forgot-form-button: Get New Password
+  b-reset-title: Reset your new password
+  b-reset-invite: Check the confirmation code sent from your registered email
+  b-reset: Reset
+  b-reset-form-button: Reset password
+  b-reset-banner: Password support center
+  b-new-password: New password
+account:
+  account-banner: My Account
+  dashboard: Dashboard
+  hello: Hello
+  joined-at: Joined at
+  not-you: If not you
+  logout: Logout
+  dashboard-desc: From your account dashboard. you can easily check {symbol} view your recent orders, manage your shipping and billing addresses and edit your password and account details
+  order-title: Your orders lists
+  order-no: No
+  order-name: Name
+  order-date: Date
+  order-total: Total
+  order-action: Action
+  save-changes: Save changes
+  payment-method: Payment method
+  payment-owner: Owner account
+  payment-identification: Identification number
+  payment-id: Payment ID
+  payment-bank: Bank name
+  payment-branch: Bank branch
+  payment-account: Account number
+  not-payment: You not't saved your Payment method yet
+  digits: digits
+  payment-update: Update payment
+  payment-create: Create payment
+  credit-card: Credit card
+  card-number: Card number
+  address-register: Address register
+  zip-postal: ZIP postal
+  postal-zip-code: Postal ZIP code 
+  card-expiry: Expiry date
+  card-name: Card holder name
+  card-cvv: Cvv
+  card-address: Registration address
+  card-upadte: Update card
+  card-create: Create card
+  have-card: You have 1 payment method
+  not-card: You not't saved your Payment method yet
+  address-billing: Billing Address
+  address-owner: Full name
+  address-phone: Phone number
+  address: Address
+  address-location: Location
+  address-state: State
+  address-city: City
+  address-town: Town
+  is-home: Is home
+  is-pickup-address: Is pickup address
+  is-default-address: Is default address
+  is-return-address: Is return address
+  false: False
+  true: True
+  address-update: Update address
+  address-create: Create address
+shop:
+  online: Online
+  ago: ago
+  days: days
+  hours: hours
+  minutes: minutes
+  follow: Follow
+  chat: Chat
+  products: Products
+  cancel-ratio: Cancel ratio
+  following: Following
+  follower: Follower
+  joined: Joined
+  rating: Rating
+  shop-information: SHOP INFORMATION
+  sort-by: Sort by
+  popular: Popular
+  latest: Latest
+  price: Price
+  default: default
+  low-to-high: low to high
+  high-to-low: high to low
+  address: Address
+  manage-shipping: Manage your shipping and delivery address
+  add-new-address: Add new address
+  name: Name
+  phone-number: Phone number
+  edit: Edit
+  default-address: Default address
+  profile-information: Profile information
+  view-update-shop: View Shop status and update your Shop profile
+  join-at: Join at
+  id: ID
+  edit-cover-photo: Edit cover photo
+  response-rate: Response rate
+  response-time: Response time
+  within-a-few-hours: Within a few hours
+  shop-reviews: Shop reviews
+  unsuccessful-rate: Unsuccessful rate
+  shop-id: Shop ID
+  shop-name: Shop Name
+  some-preview: Some preview pictures or video
+  add-photos-videos: Add photos or videos
+  shop-description: Shop description
+category:
+  title: Add 1 new product
+  desc: Please select the appropriate category for your product
+  product-name: Product name
+  tutorial1: Choose the correct category
+  tutorial2: click here to find out
+  selected: Selected
+  next: Next
+cart:
+  title: Your cart items
+  cart: Cart
+  preview: Preview
+  name: Name
+  variations: Variations
+  price: Price
+  quantity: Quantity
+  action: Action
+  update: Update
+  promo-code: Have A Promo Code
+  checkout: Checkout
+  subtotal: Subtotal
+  shipping: Shipping
+  tax: Tax
+  total: Total
+  view-cart: view cart
+  free-ship: Free Shipping on All Orders Over
+product:
+  evaluate: Evaluate
+  solded: Solded
+  weight: Weight
+  buy-with-deal: Buy with sale deal
+  shipping: Shipping
+  transport: Transport to
+  quantities: Quantities
+  available-products: available products
+  add-to-cart: Add to cart
+  order-now: Order now
+  total-liked: Total liked
+  insurance: insurance
+  return-refund: days to return and refund
+  online: Online
+  ago: ago
+  chat-now: Chat now
+  visit-shop: Visit shop
+  productions: Productions
+  response-ratio: Response ratio
+  response-time: Response time
+  in-some-hours: in some hours
+  joined: Joined
+  follower: Follower
+  product-describes: Product describes
+  category: Category
+  organization: Organization
+  updating: Updating
+  origin: Origin
+  address: Address
+  warehouse: Warehouse
+  ship-from: Ship from
+  product-evalutions: Product evalutions
+search:
+  filter-by: Filter By
+  categories: Categories
+  price: Price
+  color: Color
+  brand: Brand
+  tags: Product Tags
+  there-are: There are
+  products: products
+  sort-by: Sort by
+  relevance: Relevance
+  a-z: A to Z
+  z-a: Z to A
+  low-high: low to high
+  high-low: high to low
+  new: new
+  name: Name
+  availability: Availability
+  add-to-cart: Add to cart
+  add-success-message: Product successfully added to your shopping cart
+  dimension: Dimension
+  quantity: Quantity
+  total-products: Total products
+  total-shipping: Total shipping
+  taxes: Taxes
+  total: Total
+  continue-shopping: continue shopping
+  proceed-checkout: proceed to checkout
+  there-is: There is
+  item-in-your-cart: item in your cart
+checkout:
+  personal-information: Personal Information
+  order-as-guest: Order as a guest
+  login: Login
+  pronoun: Pronoun
+  mr: Mr
+  mrs: Mrs
+  name: Name
+  email: Email
+  password: Password
+  show: show
+  birthdate: Birthdate
+  receive offers: Receive offers from our partners
+  signup-newsletter: Sign up for our newsletter
+  continue: Continue
+  address: Address
+  address-desc: The selected address will be help we to delivery for you more easlier and faster
+  city: City
+  zip: Zip/Postal Code
+  country: Country
+  vietnam: VietNam
+  russia: Russia
+  england: England
+  united-states: United-States
+  japan: Japan
+  france: France
+  india: India
+  china: China
+  not-have-country: Don't to find my country
+  phone: Phone
+  shipping-method: Shipping method
+  delivery-next-day: Delivery next day
+  note-field: If you would like to add a note about your order, please write it in the field below
+  payment: Payment
+  pay-by-check: Pay by Credit/Visa Debit/Master card
+  pay-by-wire: Pay by bank wire
+  pay-by-cash: Pay by Cash on delivery
+  pay-by-momo: Pay by MoMo
+  item: item
+  shipping: Shipping
+  total: Total
+  taxes: Taxes
+  process-checkout: Proceed to checkout
+  secure-policy: Security Policy (commit by Reassurance)
+  delivery-policy: Delivery Policy (commit by Reassurance)
+  return-policy: Return Policy (commit by Reassurance)
+index:
+  admin-chanel: Admin chanel
+  seller-chanel: Seller chanel
+  buying-chanel: Buying chanel
+  exploring: Exploring
+  banner-desc: The top world's leading shopping app
+  download-now: Download the app now
+  service-title: Shopping anytime, anywhere
+  service-desc: Enjoy attractive promotions, super savings from the most prestigious stores
+  transfer-support: Transfer Support
+  transfer-desc: Your order status is always updated in detail since you place your order
+  customer-support: Customer support
+  customer-desc: Customer Care Department is always ready to support you 24/7
+  today-suggestion: Today's Suggestions
+  today-suggestion-desc: Choose the right products for you in Today's Suggestions
+  safe-payment: Safe payment method
+  safe-payment-desc: Easy and convenient payment. Pay on Delivery or Prepay by Credit/Debit Card
+  chat: Chat
+  chat-feature: feature
+  chat-desc: Chat directly with the seller for more product advice. You can also negotiate the desired price with the Seller through the "Chat" section
+  guarantee-privacy: Guarantee Privacy
+  commit: Shopee commits that the amount you pay will be transferred to the seller after you receive the goods. We always protect you
+  advertisement-1-desc: The place to own all the products you love
+  advertisement-2-title: Buy and sell online
+  advertisement-2-desc: Enjoy shopping and doing business with prestige
+  advertisement-3-title: gifts for new customers
+  advertisement-3-desc: Exclusive and attractive gifts for new customers at e-shopee
+  customer-opinion-title: What do users say about e-shopee
+  opinion-1: I always look forward to e-shopee to hunt for deals and always get surprisingly good deals. Not to mention every deal hunting is fun, the last deal hunt is the most fun in my 2 years of e-shopee addiction
+  opinion-2: Every time I go to e-shopee, I have great results, dozens of items keep picking up until I receive the goods, I don't even know when I ordered this or that. So addicted to e-shopee
+  joined-at: Joined at
+  copyright: Copyright
+  all-rights-reserved: All rights reserved
+contact:
+  contact-us: Contact Us
+  tell-us-desc: Tell us about your issue so we can help you more quickly
+  tell-us-support: We always ready to support for your questions 24/7
+  address: Address
+  sub-adddress: Quater 6, Linh Trung ward, Thu Duc district, Ho Chi Minh city
+  country: VietNam
+  phone: Phone
+  mobile: Mobile
+  hotline: Hotline
+  email: Email
+  tell-us-your-message: Tell Us Your Message
+  your-name: Your name
+  your-email: Your Email
+  subject: Subject
+  note: Your Message
+  submit: Submit
+sitemap:
+  sitemap: sitemap
+favourite:
+  add-to-cart: Add to cart
+  favourite-banner: Favourite page
+about:
+  about-us: About Us
+  welcome: Welcome to
+  desc-one: e-shopee is the largest eCommerce platform in Southeast Asia and Taiwan. It is a platform tailored for the region, making online shopping easy, secure and fast through its strong payment and logistical support. Shopee is strongly supported by Sea (formerly known as Garena), Southeast Asia's largest internet platform provider.
+  desc-two: Shopee can be downloaded for free on App Store and Google Play in Singapore, Malaysia, Thailand, Taiwan, Indonesia, Vietnam, and the Philippines. For more information, please visit https://shopee.vn
+  our-purpose: Our Purpose
+  purpose-desc: The Shopee team believes in the transformative power of technology and wants to change the world for the better by providing a platform to connect buyers and sellers in one community. As shopping on mobile devices becomes the new norm, Shopee aims to continuously enhance its platform to deliver a seamless and enjoyable shopping experience for all users and be the region's e-commerce platform of choice.
+  our-team: Our Team
+  team-desc: The Shopee team believes in the transformative power of technology and wants to change the world for the better by providing a platform to connect buyers and sellers in one community. As shopping on mobile devices becomes the new norm, Shopee aims to continuously enhance its platform to deliver a seamless and enjoyable shopping experience for all users and be the region's e-commerce platform of choice.
+  testimonial: Testimonial
+  testimonial-desc: The Shopee team believes in the transformative power of technology and wants to change the world for the better by providing a platform to connect buyers and sellers in one community. As shopping on mobile devices becomes the new norm, Shopee aims to continuously enhance its platform to deliver a seamless and enjoyable shopping experience for all users and be the region's e-commerce platform of choice.

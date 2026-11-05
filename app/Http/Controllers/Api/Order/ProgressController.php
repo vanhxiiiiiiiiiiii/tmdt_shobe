@@ -6,56 +6,49 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\Progress\CancelOrderRequest;
 use App\Http\Requests\Order\Progress\ReadyOrderRequest;
+use App\Http\Requests\Order\Progress\UpdateProgressRequest;
 use App\Models\Order\Order;
+use App\Services\OrderWorkflowService;
 
 class ProgressController extends Controller
 {
-    public function __construct()
+    private OrderWorkflowService $workflow;
+
+    public function __construct(OrderWorkflowService $workflow)
     {
+        $this->workflow = $workflow;
         $this->middleware('auth:sanctum');
     }
 
-    /**
-     * Mark the order as ready.
-     *
-     * @param \App\Http\Requests\Order\Progress\ReadyOrderRequest $request
-     * @param \App\Models\Order\Order $order
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function ready(ReadyOrderRequest $request, Order $order)
     {
-        $order->update([
-            'pickup_address_id' => $request->input('pickup_address_id'),
-        ]);
+        $updatedOrder = $this->workflow->transition(
+            $order,
+            OrderStatus::Ready,
+            (string) $request->input('note'),
+            $request->integer('pickup_address_id'),
+        );
 
-        $order->progresses()->create([
-            'status_id' => OrderStatus::Ready,
-            'note' => $request->input('note') ?? '',
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Order progress has been updated!',
-        ]);
+        return response()->json(['status' => true, 'message' => 'Order confirmed.', 'data' => $updatedOrder]);
     }
 
-    /**
-     * Mark the order as cancelled.
-     *
-     * @param \App\Http\Requests\Order\Progress\CancelOrderRequest $request
-     * @param \App\Models\Order\Order $order
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function cancel(CancelOrderRequest $request, Order $order)
     {
-        $order->progresses()->create([
-            'status_id' => OrderStatus::Cancelled,
-            'note' => $request->input('note') ?? '',
-        ]);
+        $updatedOrder = $this->workflow->transition(
+            $order,
+            OrderStatus::Cancelled,
+            (string) $request->input('note'),
+            requiredStatus: $request->is('api/v2/user/orders/*') ? OrderStatus::Processing : null,
+        );
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Order progress has been updated!',
-        ]);
+        return response()->json(['status' => true, 'message' => 'Order cancelled and inventory restored when applicable.', 'data' => $updatedOrder]);
+    }
+
+    public function update(UpdateProgressRequest $request, Order $order)
+    {
+        $status = OrderStatus::from((int) $request->input('status_id'));
+        $updatedOrder = $this->workflow->transition($order, $status, (string) $request->input('note'));
+
+        return response()->json(['status' => true, 'message' => 'Order status updated.', 'data' => $updatedOrder]);
     }
 }
